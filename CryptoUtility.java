@@ -27,14 +27,14 @@ public class CryptoUtility {
         return t % N;
     }
 
-      static int lehmann(int n)
+      static boolean lehmann(Long n)
     {
      
         Random rand = new Random(); 
          
-        int a = rand.nextInt(n - 3) + 2;
+        Long a = rand.nextLong(n - 3) + 2;
      
-        int e = (n - 1) / 2;
+        Long e = (n - 1) / 2;
 
         int t = 100;
      
@@ -45,16 +45,17 @@ public class CryptoUtility {
      
             if((result % n) == 1 || (result % n) == (n - 1))
             {
-                a = rand.nextInt(n - 3) + 2;
+                a = rand.nextLong(n - 3) + 2;
                 t -= 1;
             }
      
-            else
-                return -1;
+            else {
+                return false;
+            }
                  
         }
          
-        return 1;
+        return true;
     }
 
     static int gcdExtended(int A, int M)
