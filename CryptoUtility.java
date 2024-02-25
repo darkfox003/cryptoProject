@@ -40,7 +40,7 @@ public class CryptoUtility {
      * 4 * 4 * 5 = 80 mod 7 = 3 mod 7
      */
 
-      static boolean IsPrime(Long n)
+    static boolean IsPrime(Long n)
     {
      
         Random rand = new Random(); 
