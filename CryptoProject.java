@@ -58,7 +58,7 @@ public class CryptoProject {
         while (!CryptoUtility.IsPrime(start)) {
             if (start > bound) {
                 System.out.println("Out of Bound");
-                break;
+                System.exit(0);
             }
             //System.out.println(start);
             if (start % 2 == 0)
