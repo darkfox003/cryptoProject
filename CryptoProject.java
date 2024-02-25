@@ -5,7 +5,8 @@ import java.util.Random;
 
 public class CryptoProject {
     public static void main(String[] args) {
-        long num = GenPrime("download.jpg", 30);
+        System.out.println("From file : " + args[0] + "\nwith " + args[1] + " bits");
+        long num = GenPrime(args[0], Integer.valueOf(args[1]));
         System.out.println(Arrays.toString(GenRandomNowithinverse(num)));
     }
 
@@ -56,6 +57,7 @@ public class CryptoProject {
     static long findPrime(Long start, Long bound) {
         while (!CryptoUtility.IsPrime(start)) {
             if (start > bound) {
+                System.out.println("Out of Bound");
                 break;
             }
             //System.out.println(start);

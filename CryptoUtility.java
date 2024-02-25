@@ -79,9 +79,6 @@ public class CryptoUtility {
         long b1 = 1, b2 = 0;
         
         //System.out.println(A + "\t" + M + "\t0\t" + b1 + "\t" + b2 );
-
-        if (M == 1)
-            return 0;
             
         while (M > 1) {
             // q is quotient
@@ -105,14 +102,5 @@ public class CryptoUtility {
             b2 += m0;
  
         return b2;
-    }
-
-    static long modInverse(long A, long M)
-    {
-        if (GCD(A, M) != 1) {
-            System.out.println("Inverse doesn't exist");
-            return -1;
-        }
-        return FindInverse(A, M);
     }
 }
