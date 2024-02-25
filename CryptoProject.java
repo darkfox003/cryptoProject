@@ -1,13 +1,17 @@
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Random;
 
 public class CryptoProject {
     public static void main(String[] args) {
         Long num = getNum("download.jpg", 30);
         System.out.println(num);   
         System.out.println(CryptoUtility.lehmann(num));
-        System.out.println("Next Prime is : " + findPrime(num, (Long)Math.round(Math.pow(2, 30)) - 1));
+        num = findPrime(num, (Long)Math.round(Math.pow(2, 30)) - 1);
+        System.out.println("Next Prime is : " + num);
         //System.out.println(CryptoUtility.lehmann(3532802839L));
+        System.out.println(Arrays.toString(GenRandomNowithinverse(num)));
     }
 
     static long getNum(String file, int n) {
@@ -38,7 +42,7 @@ public class CryptoProject {
         return 0;
     }
 
-    static Long findPrime(Long start, Long bound) {
+    static long findPrime(Long start, Long bound) {
         while (!CryptoUtility.lehmann(start)) {
             if (start > bound) {
                 break;
@@ -50,5 +54,15 @@ public class CryptoProject {
                 start += 2;
         }
         return start;
+    }
+
+    static long[] GenRandomNowithinverse(long n) {
+        Random rand = new Random();
+        long randomNumber = rand.nextLong(n);
+        while (CryptoUtility.gcd(randomNumber, n) != 1) {
+            randomNumber = rand.nextLong(n);
+        }
+
+        return new long[]{randomNumber, CryptoUtility.gcdExtended(randomNumber, n), n};
     }
 }

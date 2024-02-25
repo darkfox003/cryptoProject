@@ -5,7 +5,7 @@ public class CryptoUtility {
     static int x;
     static int y;
 
-    static int gcd(int a, int b)
+    static long gcd(long a, long b)
     {
         if (b == 0)
             return a;
@@ -60,23 +60,23 @@ public class CryptoUtility {
         return true;
     }
 
-    static int gcdExtended(int A, int M)
+    static long gcdExtended(long A, long M)
     {
  
-        int m0 = M;
-        int b1 = 1, b2 = 0;
+        long m0 = M;
+        long b1 = 1, b2 = 0;
         
-        System.out.println(A + "\t" + M + "\t0\t" + b1 + "\t" + b2);
+        //System.out.println(A + "\t" + M + "\t0\t" + b1 + "\t" + b2);
         if (M == 1)
             return 0;
             
         while (M > 1) {
             // q is quotient
-            int q = A / M;
+            long q = A / M;
             
             // m is remainder now, process
             // same as Euclid's algo
-            int t = M;
+            long t = M;
             M = A % M;
             A = t;
                 
@@ -94,7 +94,7 @@ public class CryptoUtility {
         return b2;
     }
 
-    static int modInverse(int A, int M)
+    static long modInverse(long A, long M)
     {
         if (gcd(A, M) != 1) {
             System.out.println("Inverse doesn't exist");
