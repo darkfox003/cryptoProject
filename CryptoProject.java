@@ -3,10 +3,11 @@ import java.io.InputStream;
 
 public class CryptoProject {
     public static void main(String[] args) {
-        Long num = getNum("test.txt", 30);
+        Long num = getNum("download.jpg", 30);
         System.out.println(num);   
         System.out.println(CryptoUtility.lehmann(num));
         System.out.println("Next Prime is : " + findPrime(num, (Long)Math.round(Math.pow(2, 30)) - 1));
+        //System.out.println(CryptoUtility.lehmann(3532802839L));
     }
 
     static long getNum(String file, int n) {

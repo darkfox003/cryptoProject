@@ -24,6 +24,7 @@ public class CryptoUtility {
             base = (base * base) % N;
             exp /= 2;
         }
+
         return t % N;
     }
 
@@ -50,6 +51,7 @@ public class CryptoUtility {
             }
      
             else {
+                //System.out.println(result);
                 return false;
             }
                  
