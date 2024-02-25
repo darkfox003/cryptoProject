@@ -2,18 +2,15 @@ import java.util.Random;
 
 public class CryptoUtility {
 
-    static int x;
-    static int y;
-
-    static long gcd(long a, long b)
+    static long GCD(long a, long b)
     {
         if (b == 0)
             return a;
 
-        return gcd(b, a % b);
+        return GCD(b, a % b);
     }
 
-    static long fastExpo(long base, long exp, long N)
+    static long FastExpo(long base, long exp, long N)
     {
         long t = 1L;
         while (exp > 0) {
@@ -22,13 +19,28 @@ public class CryptoUtility {
                 t = (t * base) % N;
  
             base = (base * base) % N;
+            //System.out.println(t + " " + base);
             exp /= 2;
         }
 
         return t % N;
     }
 
-      static boolean lehmann(Long n)
+    /*
+     * 11 -> 1011 -> 5 101 -> 2 -> 10 -> 1 -> 1 -> 0
+     * t = 1 * 5 = 5 * 4 = 6 * 4 = 3
+     * base = 5 * 5 = 4 * 4 = 2 * 2 = 4 * 4 = 2
+     * 
+     * 5 ^ 11 mod 7
+     * 11 = 1011
+     * 0 5                  1
+     * 1 5 * 5 = 4 mod 7    1
+     * 2 4 * 4 = 2 mod 7    0
+     * 3 2 * 2 = 4 mod 7    1
+     * 4 * 4 * 5 = 80 mod 7 = 3 mod 7
+     */
+
+      static boolean IsPrime(Long n)
     {
      
         Random rand = new Random(); 
@@ -42,7 +54,7 @@ public class CryptoUtility {
         while(t > 0)
         {
      
-            long result = fastExpo(a, e, n);
+            long result = FastExpo(a, e, n);
      
             if((result % n) == 1 || (result % n) == (n - 1))
             {
@@ -60,13 +72,14 @@ public class CryptoUtility {
         return true;
     }
 
-    static long gcdExtended(long A, long M)
+    static long FindInverse(long A, long M)
     {
  
         long m0 = M;
         long b1 = 1, b2 = 0;
         
-        //System.out.println(A + "\t" + M + "\t0\t" + b1 + "\t" + b2);
+        //System.out.println(A + "\t" + M + "\t0\t" + b1 + "\t" + b2 );
+
         if (M == 1)
             return 0;
             
@@ -96,10 +109,10 @@ public class CryptoUtility {
 
     static long modInverse(long A, long M)
     {
-        if (gcd(A, M) != 1) {
+        if (GCD(A, M) != 1) {
             System.out.println("Inverse doesn't exist");
             return -1;
         }
-        return gcdExtended(A, M);
+        return FindInverse(A, M);
     }
 }

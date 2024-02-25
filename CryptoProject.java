@@ -5,15 +5,25 @@ import java.util.Random;
 
 public class CryptoProject {
     public static void main(String[] args) {
-        Long num = getNum("download.jpg", 30);
-        System.out.println(num);   
-        System.out.println(CryptoUtility.lehmann(num));
-        num = findPrime(num, (Long)Math.round(Math.pow(2, 30)) - 1);
-        System.out.println("Next Prime is : " + num);
-        //System.out.println(CryptoUtility.lehmann(3532802839L));
+        long num = GenPrime("download.jpg", 30);
         System.out.println(Arrays.toString(GenRandomNowithinverse(num)));
     }
 
+    static long GenPrime(String file, int n) {
+        long num = getNum(file, n);
+        System.out.println("Number from file : " + num);
+        if (CryptoUtility.IsPrime(num)) {
+            System.out.println(num + " is Prime");
+        }
+        else {
+            System.out.println(num + " is not Prime");
+            num = findPrime(num, (Long)Math.round(Math.pow(2, n)) - 1);
+            System.out.println("Next Prime is : " + num);
+        }
+        return num;
+    }
+ 
+    //get number from file
     static long getNum(String file, int n) {
         try {
             InputStream in = new FileInputStream(file);
@@ -42,8 +52,9 @@ public class CryptoProject {
         return 0;
     }
 
+    //check prime
     static long findPrime(Long start, Long bound) {
-        while (!CryptoUtility.lehmann(start)) {
+        while (!CryptoUtility.IsPrime(start)) {
             if (start > bound) {
                 break;
             }
@@ -56,13 +67,14 @@ public class CryptoProject {
         return start;
     }
 
+    //generate number and find inverse
     static long[] GenRandomNowithinverse(long n) {
         Random rand = new Random();
         long randomNumber = rand.nextLong(n);
-        while (CryptoUtility.gcd(randomNumber, n) != 1) {
+        while (CryptoUtility.GCD(randomNumber, n) != 1) {
             randomNumber = rand.nextLong(n);
         }
 
-        return new long[]{randomNumber, CryptoUtility.gcdExtended(randomNumber, n), n};
+        return new long[]{randomNumber, CryptoUtility.FindInverse(randomNumber, n), n};
     }
 }
