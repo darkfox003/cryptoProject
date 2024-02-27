@@ -13,6 +13,7 @@ public class CryptoProject {
     static long GenPrime(String file, int n) {
         long num = getNum(file, n);
         System.out.println("Number from file : " + num);
+
         if (CryptoUtility.IsPrime(num)) {
             System.out.println(num + " is Prime");
         }
@@ -65,14 +66,15 @@ public class CryptoProject {
 
     //check prime
     static long findPrime(Long start, Long bound) {
+        if (start % 2 == 0)
+            start++;
+
         while (!CryptoUtility.IsPrime(start)) {
             if (start > bound) {
                 System.out.println("Out of Bound");
                 System.exit(0);
             }
             //System.out.println(start);
-            if (start % 2 == 0)
-                start ++;
             else 
                 start += 2;
         }
