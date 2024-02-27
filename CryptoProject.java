@@ -7,7 +7,9 @@ public class CryptoProject {
     public static void main(String[] args) {
         System.out.println("From file : " + args[0] + "\nwith " + args[1] + " bits");
         long num = GenPrime(args[0], Integer.valueOf(args[1]));
-        System.out.println("[e, e^-1, n] : " + Arrays.toString(GenRandomNowithinverse(num)));
+        long[] res = GenRandomNowithinverse(num);
+        System.out.println("[e, e^-1, n] : " + Arrays.toString(res));
+        System.out.println("Check [e * e^-1 mod n] : " + (res[0] * res[1]) % res[2]);
     }
 
     static long GenPrime(String file, int n) {
@@ -38,10 +40,15 @@ public class CryptoProject {
                 //     // Append the bit to the StringBuilder
                 //     res += String.valueOf(bit);
                 // }
-                res += String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
-            } 
-            while (res.charAt(0) == '0')
-                res = res.substring(1);
+                
+                //res += String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
+                res += String.valueOf(Integer.toBinaryString(b));
+            }
+            // System.out.println("Before : " + res); 
+            // res = res.substring(res.indexOf("1"));
+            // System.out.println("After : " + res);
+            // while (res.charAt(0) == '0')
+            //     res = res.substring(1);
             if (res.length() < n) {
                 System.out.println("Before padding : " + res);
                 for (int i = res.length(); i < n; i++) {
