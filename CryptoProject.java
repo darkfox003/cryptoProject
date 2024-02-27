@@ -16,7 +16,7 @@ public class CryptoProject {
         long num = getNum(file, n);
         System.out.println("Number from file : " + num);
 
-        if (CryptoUtility.IsPrime(num)) {
+        if (num % 2 != 0 && CryptoUtility.IsPrime(num)) {
             System.out.println(num + " is Prime");
         }
         else {
