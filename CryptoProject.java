@@ -7,7 +7,7 @@ public class CryptoProject {
     public static void main(String[] args) {
         System.out.println("From file : " + args[0] + "\nwith " + args[1] + " bits");
         long num = GenPrime(args[0], Integer.valueOf(args[1]));
-        System.out.println(Arrays.toString(GenRandomNowithinverse(num)));
+        System.out.println("[e, e^-1, n] : " + Arrays.toString(GenRandomNowithinverse(num)));
     }
 
     static long GenPrime(String file, int n) {
@@ -41,7 +41,8 @@ public class CryptoProject {
             while (res.charAt(0) == '0')
                 res = res.substring(1);
             if (res.length() < n) {
-                for (int i = res.length(); i <= n; i++) {
+                System.out.println("Before padding : " + res);
+                for (int i = res.length(); i < n; i++) {
                     res += "0";
                 }
             }
@@ -50,6 +51,7 @@ public class CryptoProject {
             }
             //System.out.println(res);
             in.close();
+            System.out.println("Bit from File : " + res);
             return (Long.parseLong(res, 2));
             //System.out.println(Long.parseLong(res, 2));
 
