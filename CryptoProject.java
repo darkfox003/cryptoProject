@@ -40,7 +40,14 @@ public class CryptoProject {
             }
             while (res.charAt(0) == '0')
                 res = res.substring(1);
-            res = res.substring(0, n);
+            if (res.length() < n) {
+                for (int i = res.length(); i <= n; i++) {
+                    res += "0";
+                }
+            }
+            else {
+                res = res.substring(0, n);
+            }
             //System.out.println(res);
             in.close();
             return (Long.parseLong(res, 2));
