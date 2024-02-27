@@ -102,7 +102,7 @@ public class CryptoUtility {
             
         // Make x positive
         if (b2 < 0)
-            b2 += m0;
+            b2 = (b2 + m0) % m0;
  
         return b2;
     }
