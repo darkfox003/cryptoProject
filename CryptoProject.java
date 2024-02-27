@@ -31,13 +31,14 @@ public class CryptoProject {
             byte[] bytes = in.readAllBytes();
             String res = "";
             for(byte b : bytes) {
-                for (int i = 7; i >= 0; i--) {
-                    // Extract each bit using bitwise AND operation
-                    int bit = (b >> i) & 1;
-                    // Append the bit to the StringBuilder
-                    res += String.valueOf(bit);
-                }
-            }
+                // for (int i = 7; i >= 0; i--) {
+                //     // Extract each bit using bitwise AND operation
+                //     int bit = (b >> i) & 1;
+                //     // Append the bit to the StringBuilder
+                //     res += String.valueOf(bit);
+                // }
+                res += String.format("%8s", Integer.toBinaryString(b & 0xFF)).replace(' ', '0');
+            } 
             while (res.charAt(0) == '0')
                 res = res.substring(1);
             if (res.length() < n) {

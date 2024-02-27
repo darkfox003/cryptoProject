@@ -53,6 +53,9 @@ public class CryptoUtility {
      
         while(t > 0)
         {
+
+            if (GCD(a, n) > 1)
+                return false;
      
             long result = FastExpo(a, e, n);
      
