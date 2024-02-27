@@ -106,4 +106,14 @@ public class CryptoUtility {
  
         return b2;
     }
+
+    static long Power(long base, long exp) {
+        long res = base;
+
+        for (int i = 0; i < exp; i++) {
+            res *= base;
+        }
+
+        return res;
+    }
 }

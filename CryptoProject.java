@@ -18,7 +18,7 @@ public class CryptoProject {
         }
         else {
             System.out.println(num + " is not Prime");
-            num = findPrime(num, (Long)Math.round(Math.pow(2, n)) - 1);
+            num = findPrime(num, CryptoUtility.Power(2, n) - 1);
             System.out.println("Next Prime is : " + num);
         }
         return num;
@@ -59,8 +59,8 @@ public class CryptoProject {
         }
         catch(Exception e) {
             e.printStackTrace();
+            return 0;
         }
-        return 0;
     }
 
     //check prime
