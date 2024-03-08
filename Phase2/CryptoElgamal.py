@@ -1,0 +1,167 @@
+import random
+from math import sqrt
+
+def GenGenerator(p):
+    rand = random.randint(2, p)
+    #rand = FastExpo(rand, 2, p)
+    if IsPrime(int((p - 1) / 2)):
+        n = int((p - 1) / 2)
+        if FastExpo(rand, n, p) != 1:
+            return rand
+        else:
+            return -rand + p
+    else:
+        s = GenPrimeFactor(p - 1)
+        while not CheckGenerator(rand, s, p):
+            rand = random.randint(2, p)
+            #rand = FastExpo(rand, 2, p)
+        return rand
+
+
+def CheckGenerator(g, s, p):
+    if GCD(g, p) != 1:
+        return False
+    for i in s:
+        if (FastExpo(g, (p - 1) // i, p) == 1):
+            return False
+    return True
+
+def GenPrimeFactor(p):
+    s = set()
+
+    while (p % 2 == 0):
+        s.add(2)
+        p //= 2
+    
+    for i in range(3, int(sqrt(p)), 2):
+        while (p % i == 0):
+            s.add(i)
+            p //= i
+
+    if (p > 2):
+        s.add(p)
+    
+    return s
+
+def IsPrime(num):
+    a = random.randint(2, num)
+ 
+    e =(num-1)/2
+    t = 100
+
+    while(t>0):
+        result = FastExpo(a, e, num)
+ 
+        if((result % num)== 1 or (result % num)==(num - 1)):
+            a = random.randint(2, num)
+            t -= 1
+ 
+        else:
+            return False
+ 
+    return True
+
+def FastExpo(base, exp, mod):
+    t = 1
+    while(exp > 0): 
+        if (exp % 2 != 0):
+            t = (t * base) % mod
+ 
+        base = (base * base) % mod
+        exp = int(exp / 2)
+    return t % mod
+
+def GCD(a, b):
+    if b == 0:
+        return a
+    return GCD(b, a % b)
+
+def ElgamalKeyGen(p):
+    g = GenGenerator(p)
+    u = random.randint(2, p)
+    y = FastExpo(g, u, p)
+    print("Public key (p, g, y) : (" + str(p) + ", " + str(g) + ", " + str(y) + ")")
+    print("Private key : " + str(u))
+    return {"p" : p, "g" : g, "y" : y}, {"u" : u, "p" : p}
+
+def ElgamalEncrypt(pk, txt):
+    #res = StringToAscii(txt)
+    cipher = []
+    for ele in txt:
+        k =  random.randint(2, pk["p"])
+        while GCD(k, pk["p"] - 1) != 1:
+            k = random.randint(2, pk["p"])
+        #print(k, end=' ')
+        cipher.append(GenAB(pk, k, ele))
+    return cipher
+
+def StringToAscii(txt):
+    res = [ord(ele) for ele in txt]
+    print(res)
+    return res
+
+def GenAB(pk, k, txt):
+    a = FastExpo(pk["g"], k, pk["p"])
+    b = (FastExpo(pk["y"], k, pk["p"]) * txt) % pk["p"]
+    return {"a" : a, "b" : b}
+
+def ElgamalDecrypt(sk, cipher):
+    res = []
+    exp = sk["p"] - 1 - sk["u"]
+    for ele in cipher:
+        res.append((FastExpo(ele["a"], exp, sk["p"]) * ele["b"]) % sk["p"])
+    return res
+
+def bytes_to_bits_binary(byte_data):
+    bits_data = [bin(byte)[2:].zfill(8) for byte in byte_data]
+    return ''.join(bits_data)
+
+def bits_to_bytes(bit_string):
+    padded_bit_string = bit_string + '0' * (8 - (len(bit_string) % 8))
+    chunks = [padded_bit_string[i:i+8] for i in range(0, len(padded_bit_string), 8)]
+    byte_values = [int(chunk, 2) for chunk in chunks]
+    return bytes(byte_values)
+
+def readPlainText(filename, p):
+    blocksize = p.bit_length() - 1
+    f = open(filename, "rb")
+    data = f.read()
+    f.close()
+    print("Data : " + str(data))
+    data = bytes_to_bits_binary(data)
+    print("DataB : " + str(data))
+    print(bits_to_bytes(data))
+    block = []
+    for i in range(0, len(data) + 1, blocksize):
+        ele = data[i:i + blocksize]
+        if len(ele) != blocksize:
+            ele += '0' * (blocksize - len(ele))
+        block.append(int(ele, 2))
+    return block
+
+p = 1031
+print(p)
+print(p.bit_length())
+pk, sk = ElgamalKeyGen(p)
+readF = readPlainText("./Phase2/test.py", p)
+print(readF)
+cipher = ElgamalEncrypt(pk, readF)
+print("Cipher : ", end='')
+print(cipher)
+# c = b''
+# for ele in cipher:
+#     c += int.to_bytes(ele["a"], 3)
+#     c += int.to_bytes(ele["b"], 3)
+# print(c)
+
+plain = ElgamalDecrypt(sk, cipher)
+print("Plain : ", end='')
+print(plain)
+b = ''
+for ele in plain:
+    bits = bin(ele)[2:]
+    if len(bits) < (p.bit_length() - 1):
+        bits = ('0' * ((p.bit_length() - 1) - len(bits))) + bits
+    b += bits
+print(b)
+print(bits_to_bytes(b))
