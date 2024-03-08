@@ -102,37 +102,50 @@ def writePlainText(output, p):
     blocksize = p.bit_length() - 1
     res = ''
     for ele in output:
-        b = bin(ele)[2:]
-        if len(b) < blocksize:
-            b = ('0' * (blocksize - len(b))) + b
+        b = bin(ele)[2:].zfill(blocksize)
         res += b
     return res
 
+def outputCipher(cipher, p, file="output.txt"):
+    blocksize = p.bit_length() - 1
+    f = open(file, "w")
+    for ele in cipher:
+        a = bin(ele["a"])[2:].zfill(blocksize)
+        b = bin(ele["b"])[2:].zfill(blocksize)
+        print(a, b)
+        f.write(a)
+        f.write(b)
+    f.close()
+
+def inputCipher(file, p):
+    f = open(file, "r")
+    data = f.read()
+    f.close()
+    blocksize = p.bit_length()
+    data = [data[i:i+blocksize] for i in range(0, len(data), blocksize)]
+    res = []
+    for i in range(0, len(data), 2):
+        ele = {}
+        ele["a"] = int(data[i], 2)
+        ele["b"] = int(data[i + 1], 2)
+        res.append(ele)
+    return res
+
+
 p = GenPrime("./Phase2/inp.txt", 30)
 print(p.bit_length())
-pk, sk = ElgamalKeyGen(p)
-readF = readPlainText("./Phase2/sample.txt", p)
-print(readF)
-cipher = ElgamalEncrypt(pk, readF)
-print("Cipher : ", end='')
-print(cipher)
-# # c = b''
-# # for ele in cipher:
-# #     c += int.to_bytes(ele["a"], 3)
-# #     c += int.to_bytes(ele["b"], 3)
-# # print(c)
+# pk, sk = ElgamalKeyGen(p)
+# readF = readPlainText("./Phase2/sample.txt", p)
+# print(readF)
+# cipher = ElgamalEncrypt(pk, readF)
+# print("Cipher : ", end='')
+# print(cipher)
+# outputCipher(cipher, p)
 
-plain = ElgamalDecrypt(sk, cipher)
-print("Plain : ", end='')
-print(plain)
-res = writePlainText(plain, p)
-print(res)
-print(bits_to_bytes(res))
-# b = ''
-# for ele in plain:
-#     bits = bin(ele)[2:]
-#     if len(bits) < (p.bit_length() - 1):
-#         bits = ('0' * ((p.bit_length() - 1) - len(bits))) + bits
-#     b += bits
-# print(b)
-# print(bits_to_bytes(b))
+Newcipher = inputCipher("output.txt", p)
+print(Newcipher)
+# plain = ElgamalDecrypt(sk, Newcipher)
+# print("Plain : ", end='')
+# print(plain)
+# res = writePlainText(plain, p)
+# print(bits_to_bytes(res))

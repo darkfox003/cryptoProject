@@ -39,5 +39,4 @@ def chekAlgo(b):
 # print(FastExpo(705, 25, 761))
 # print(FastExpo(705, 46, 761))
 #test(718, 761)
-chekAlgo(29)
-        
+# chekAlgo(29)
