@@ -1,4 +1,5 @@
 import random
+from CryptoUtility import *
 from math import sqrt
 
 def GenGenerator(p):
@@ -43,39 +44,6 @@ def GenPrimeFactor(p):
     
     return s
 
-def IsPrime(num):
-    a = random.randint(2, num)
- 
-    e =(num-1)/2
-    t = 100
-
-    while(t>0):
-        result = FastExpo(a, e, num)
- 
-        if((result % num)== 1 or (result % num)==(num - 1)):
-            a = random.randint(2, num)
-            t -= 1
- 
-        else:
-            return False
- 
-    return True
-
-def FastExpo(base, exp, mod):
-    t = 1
-    while(exp > 0): 
-        if (exp % 2 != 0):
-            t = (t * base) % mod
- 
-        base = (base * base) % mod
-        exp = int(exp / 2)
-    return t % mod
-
-def GCD(a, b):
-    if b == 0:
-        return a
-    return GCD(b, a % b)
-
 def ElgamalKeyGen(p):
     g = GenGenerator(p)
     u = random.randint(2, p)
@@ -112,16 +80,6 @@ def ElgamalDecrypt(sk, cipher):
         res.append((FastExpo(ele["a"], exp, sk["p"]) * ele["b"]) % sk["p"])
     return res
 
-def bytes_to_bits_binary(byte_data):
-    bits_data = [bin(byte)[2:].zfill(8) for byte in byte_data]
-    return ''.join(bits_data)
-
-def bits_to_bytes(bit_string):
-    padded_bit_string = bit_string + '0' * (8 - (len(bit_string) % 8))
-    chunks = [padded_bit_string[i:i+8] for i in range(0, len(padded_bit_string), 8)]
-    byte_values = [int(chunk, 2) for chunk in chunks]
-    return bytes(byte_values)
-
 def readPlainText(filename, p):
     blocksize = p.bit_length() - 1
     f = open(filename, "rb")
@@ -139,29 +97,29 @@ def readPlainText(filename, p):
         block.append(int(ele, 2))
     return block
 
-p = 1031
-print(p)
-print(p.bit_length())
-pk, sk = ElgamalKeyGen(p)
-readF = readPlainText("./Phase2/test.py", p)
-print(readF)
-cipher = ElgamalEncrypt(pk, readF)
-print("Cipher : ", end='')
-print(cipher)
-# c = b''
-# for ele in cipher:
-#     c += int.to_bytes(ele["a"], 3)
-#     c += int.to_bytes(ele["b"], 3)
-# print(c)
+# p = 1031
+# print(p)
+# print(p.bit_length())
+# pk, sk = ElgamalKeyGen(p)
+# readF = readPlainText("./Phase2/test.py", p)
+# print(readF)
+# cipher = ElgamalEncrypt(pk, readF)
+# print("Cipher : ", end='')
+# print(cipher)
+# # c = b''
+# # for ele in cipher:
+# #     c += int.to_bytes(ele["a"], 3)
+# #     c += int.to_bytes(ele["b"], 3)
+# # print(c)
 
-plain = ElgamalDecrypt(sk, cipher)
-print("Plain : ", end='')
-print(plain)
-b = ''
-for ele in plain:
-    bits = bin(ele)[2:]
-    if len(bits) < (p.bit_length() - 1):
-        bits = ('0' * ((p.bit_length() - 1) - len(bits))) + bits
-    b += bits
-print(b)
-print(bits_to_bytes(b))
+# plain = ElgamalDecrypt(sk, cipher)
+# print("Plain : ", end='')
+# print(plain)
+# b = ''
+# for ele in plain:
+#     bits = bin(ele)[2:]
+#     if len(bits) < (p.bit_length() - 1):
+#         bits = ('0' * ((p.bit_length() - 1) - len(bits))) + bits
+#     b += bits
+# print(b)
+# print(bits_to_bytes(b))
