@@ -1,5 +1,6 @@
 import random
 from CryptoUtility import *
+from CryptoP1 import *
 from math import sqrt
 
 def GenGenerator(p):
@@ -97,24 +98,36 @@ def readPlainText(filename, p):
         block.append(int(ele, 2))
     return block
 
-# p = 1031
-# print(p)
-# print(p.bit_length())
-# pk, sk = ElgamalKeyGen(p)
-# readF = readPlainText("./Phase2/test.py", p)
-# print(readF)
-# cipher = ElgamalEncrypt(pk, readF)
-# print("Cipher : ", end='')
-# print(cipher)
+def writePlainText(output, p):
+    blocksize = p.bit_length() - 1
+    res = ''
+    for ele in output:
+        b = bin(ele)[2:]
+        if len(b) < blocksize:
+            b = ('0' * (blocksize - len(b))) + b
+        res += b
+    return res
+
+p = GenPrime("./Phase2/inp.txt", 30)
+print(p.bit_length())
+pk, sk = ElgamalKeyGen(p)
+readF = readPlainText("./Phase2/sample.txt", p)
+print(readF)
+cipher = ElgamalEncrypt(pk, readF)
+print("Cipher : ", end='')
+print(cipher)
 # # c = b''
 # # for ele in cipher:
 # #     c += int.to_bytes(ele["a"], 3)
 # #     c += int.to_bytes(ele["b"], 3)
 # # print(c)
 
-# plain = ElgamalDecrypt(sk, cipher)
-# print("Plain : ", end='')
-# print(plain)
+plain = ElgamalDecrypt(sk, cipher)
+print("Plain : ", end='')
+print(plain)
+res = writePlainText(plain, p)
+print(res)
+print(bits_to_bytes(res))
 # b = ''
 # for ele in plain:
 #     bits = bin(ele)[2:]

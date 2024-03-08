@@ -39,7 +39,19 @@ def bytes_to_bits_binary(byte_data):
     return ''.join(bits_data)
 
 def bits_to_bytes(bit_string):
-    padded_bit_string = bit_string + '0' * (8 - (len(bit_string) % 8))
+    if len(bit_string) % 8 != 0: 
+        padded_bit_string = bit_string + '0' * (8 - (len(bit_string) % 8))
+    else:
+        padded_bit_string = bit_string
     chunks = [padded_bit_string[i:i+8] for i in range(0, len(padded_bit_string), 8)]
     byte_values = [int(chunk, 2) for chunk in chunks]
+    while byte_values[len(byte_values) - 1] == 0:
+        byte_values = byte_values[0:len(byte_values) - 1]
+    # print(type(byte_values[len(byte_values) - 1]))
     return bytes(byte_values)
+
+def Power(base, exp):
+    res = base
+    for i in range(exp):
+        res *= base
+    return res
