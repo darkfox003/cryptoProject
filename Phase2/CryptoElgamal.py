@@ -107,11 +107,11 @@ def writePlainText(output, p):
     return res
 
 def outputCipher(cipher, p, file="output.txt"):
-    blocksize = p.bit_length() - 1
+    blocksize = p.bit_length()
     f = open(file, "w")
     for ele in cipher:
-        a = bin(ele["a"])[2:].zfill(blocksize)
-        b = bin(ele["b"])[2:].zfill(blocksize)
+        a = (bin(ele["a"])[2:]).zfill(blocksize)
+        b = (bin(ele["b"])[2:]).zfill(blocksize)
         print(a, b)
         f.write(a)
         f.write(b)
@@ -123,6 +123,7 @@ def inputCipher(file, p):
     f.close()
     blocksize = p.bit_length()
     data = [data[i:i+blocksize] for i in range(0, len(data), blocksize)]
+    print(data)
     res = []
     for i in range(0, len(data), 2):
         ele = {}
@@ -134,13 +135,13 @@ def inputCipher(file, p):
 
 p = GenPrime("./Phase2/inp.txt", 30)
 print(p.bit_length())
-# pk, sk = ElgamalKeyGen(p)
-# readF = readPlainText("./Phase2/sample.txt", p)
-# print(readF)
-# cipher = ElgamalEncrypt(pk, readF)
-# print("Cipher : ", end='')
-# print(cipher)
-# outputCipher(cipher, p)
+pk, sk = ElgamalKeyGen(p)
+readF = readPlainText("./Phase2/sample.txt", p)
+print(readF)
+cipher = ElgamalEncrypt(pk, readF)
+print("Cipher : ", end='')
+print(cipher)
+outputCipher(cipher, p)
 
 Newcipher = inputCipher("output.txt", p)
 print(Newcipher)
