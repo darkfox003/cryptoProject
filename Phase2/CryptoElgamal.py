@@ -4,10 +4,10 @@ from CryptoP1 import *
 from math import sqrt
 
 def GenGenerator(p):
-    rand = random.randint(2, p)
+    rand = random.randint(2, p - 1)
     #rand = FastExpo(rand, 2, p)
-    if IsPrime(int((p - 1) / 2)):
-        n = int((p - 1) / 2)
+    if IsPrime((p - 1) // 2):
+        n = (p - 1) // 2
         if FastExpo(rand, n, p) != 1:
             return rand
         else:
@@ -15,10 +15,11 @@ def GenGenerator(p):
     else:
         s = GenPrimeFactor(p - 1)
         while not CheckGenerator(rand, s, p):
-            rand = random.randint(2, p)
+            #rand = random.randint(2, p - 1)
+            rand = (rand + 1) % p
+            print(rand)
             #rand = FastExpo(rand, 2, p)
         return rand
-
 
 def CheckGenerator(g, s, p):
     if GCD(g, p) != 1:
@@ -47,19 +48,19 @@ def GenPrimeFactor(p):
 
 def ElgamalKeyGen(p):
     g = GenGenerator(p)
-    u = random.randint(2, p)
+    u = random.randint(2, p - 1)
     y = FastExpo(g, u, p)
     print("Public key (p, g, y) : (" + str(p) + ", " + str(g) + ", " + str(y) + ")")
-    print("Private key : " + str(u))
+    #print("Private key : " + str(u))
     return {"p" : p, "g" : g, "y" : y}, {"u" : u, "p" : p}
 
 def ElgamalEncrypt(pk, txt):
     #res = StringToAscii(txt)
     cipher = []
     for ele in txt:
-        k =  random.randint(2, pk["p"])
+        k =  random.randint(2, pk["p"] - 1)
         while GCD(k, pk["p"] - 1) != 1:
-            k = random.randint(2, pk["p"])
+            k = random.randint(2, pk["p"] - 1)
         #print(k, end=' ')
         cipher.append(GenAB(pk, k, ele))
     return cipher
@@ -82,14 +83,14 @@ def ElgamalDecrypt(sk, cipher):
     return res
 
 def readPlainText(filename, p):
-    blocksize = p.bit_length() - 1
+    blocksize = p.bit_length() - 1 
     f = open(filename, "rb")
     data = f.read()
     f.close()
-    print("Data : " + str(data))
+    # print("Data : " + str(data))
     data = bytes_to_bits_binary(data)
-    print("DataB : " + str(data))
-    print(bits_to_bytes(data))
+    # print("DataB : " + str(data))
+    # print(bits_to_bytes(data))
     block = []
     for i in range(0, len(data) + 1, blocksize):
         ele = data[i:i + blocksize]
@@ -98,55 +99,123 @@ def readPlainText(filename, p):
         block.append(int(ele, 2))
     return block
 
-def writePlainText(output, p):
+def writePlainText(output, p, file):
     blocksize = p.bit_length() - 1
     res = ''
     for ele in output:
         b = bin(ele)[2:].zfill(blocksize)
         res += b
-    return res
+    res = bits_to_bytes(res)
+    f = open(file, "wb")
+    f.write(res)
+    f.close()
 
-def outputCipher(cipher, p, file="output.txt"):
+def outputCipher(cipher, p, file):
     blocksize = p.bit_length()
-    f = open(file, "w")
+    f = open(file, "wb")
+    res = ''
     for ele in cipher:
         a = (bin(ele["a"])[2:]).zfill(blocksize)
         b = (bin(ele["b"])[2:]).zfill(blocksize)
-        print(a, b)
-        f.write(a)
-        f.write(b)
+        res += a
+        res += b
+    res = bits_to_bytes(res)
+    f.write(res)
     f.close()
+
+def outputImageCipher(cipher, p, file):
+    pass
 
 def inputCipher(file, p):
-    f = open(file, "r")
+    f = open(file, "rb")
     data = f.read()
     f.close()
+    data = bytes_to_bits_binary(data)
     blocksize = p.bit_length()
     data = [data[i:i+blocksize] for i in range(0, len(data), blocksize)]
-    print(data)
     res = []
     for i in range(0, len(data), 2):
-        ele = {}
-        ele["a"] = int(data[i], 2)
-        ele["b"] = int(data[i + 1], 2)
-        res.append(ele)
+        if i + 1 < len(data):
+            ele = {}
+            ele["a"] = int(data[i], 2)
+            ele["b"] = int(data[i + 1], 2)
+            res.append(ele)
     return res
 
+def readPublicKey():
+    f = open("./Phase2/pk.txt", "r")
+    data = f.read()
+    f.close()
+    data = data.split('\n')
+    res = {}
+    for ele in data:
+        ele = ele.split(' ')
+        if len(ele) > 1:
+            res[ele[0]] = {"p": int(ele[1]), "g": int(ele[2]), "y": int(ele[3])} 
+    return res
 
-p = GenPrime("./Phase2/inp.txt", 30)
-print(p.bit_length())
-pk, sk = ElgamalKeyGen(p)
-readF = readPlainText("./Phase2/sample.txt", p)
-print(readF)
-cipher = ElgamalEncrypt(pk, readF)
-print("Cipher : ", end='')
-print(cipher)
-outputCipher(cipher, p)
+def readPublicKeyWho(who):
+    pkList = readPublicKey()
+    return pkList[who]
 
-Newcipher = inputCipher("output.txt", p)
-print(Newcipher)
-# plain = ElgamalDecrypt(sk, Newcipher)
-# print("Plain : ", end='')
-# print(plain)
-# res = writePlainText(plain, p)
-# print(bits_to_bytes(res))
+def readPrivateKey():
+    f = open("./Phase2/sk.txt", "r")
+    data = f.read().split(' ')
+    f.close()
+    return {"u" : int(data[0]), "p" : int(data[1])}
+
+def writePublicKey(owner, pk):
+    pkList = readPublicKey()
+    pkList[owner] = pk
+    out = ""
+    for pk in pkList:
+        out += pk + " " + str(pkList[pk]["p"]) + " " + str(pkList[pk]["g"]) + " " + str(pkList[pk]["y"]) + "\n"
+    f = open("./Phase2/pk.txt", "w")
+    f.write(out)
+    f.close()
+
+def writePrivateKey(sk):
+    out = "" + str(sk["u"]) + " " + str(sk["p"])
+    f = open("./Phase2/sk.txt", "w")
+    f.write(out)
+    f.close()
+
+def main():
+    mode = int(input("Input Mode (1:KeyGen, 2:Encrypt, 3:Decrypt) : "))
+    if mode == 1:
+        keyFile = input("What Key File : ")
+        if keyFile == '':
+            p = GenPrime("./Phase2/inp.txt", 50)
+        else:
+            p = GenPrime(keyFile, 50)
+        pk, sk = ElgamalKeyGen(p)
+        writePublicKey("me", pk)
+        writePrivateKey(sk)
+    elif mode == 2:
+        file = input("What File : ")
+        who = input("Send to : ")
+        output = input("Output File : ")
+        lfile = file.split('.')
+        lfile = lfile[len(lfile) - 1]
+        pkWho = readPublicKeyWho(who)
+        readF = readPlainText(file, pkWho["p"])
+        cipher = ElgamalEncrypt(pkWho, readF)
+        if output == '':
+            if lfile == 'jpg' or lfile == 'png':
+                outputCipher(cipher, pkWho["p"], "output."+lfile)
+            else:
+                outputCipher(cipher, pkWho["p"], "output."+lfile)
+        else:
+            outputCipher(cipher, pkWho["p"], output)
+    elif mode == 3:
+        cipher = input("Cipher File : ")
+        output = input("Output File : ")
+        sk = readPrivateKey()
+        NewCipher = inputCipher(cipher, sk["p"])
+        plainText = ElgamalDecrypt(sk, NewCipher)
+        writePlainText(plainText, sk["p"], output)
+    else:
+        print("Mode error!!")
+
+if __name__ == '__main__':
+    main()

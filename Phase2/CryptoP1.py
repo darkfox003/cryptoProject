@@ -2,13 +2,14 @@ from CryptoUtility import *
 
 def GenPrime(file, n):
     num = getNum(file, n)
-    print("Number from file :", num)
+    # print("Number from file :", num)
     if num % 2 == 0 and IsPrime(num):
-        print(num, "is Prime")
+        # print(num, "is Prime")
+        pass
     else:
-        print(num, "is not Prime")
+        # print(num, "is not Prime")
         num = findPrime(num, Power(2, n) - 1)
-        print("Next Prime is :", num)
+        # print("Next Prime is :", num)
     return num
 
 def getNum(file, n):
@@ -32,5 +33,6 @@ def findPrime(start, bound):
         if (start > bound):
             print("Out of Bound")
             exit(0)
+
         start += 2
     return start

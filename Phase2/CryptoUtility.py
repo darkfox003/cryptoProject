@@ -1,14 +1,14 @@
 import random
 
 def IsPrime(num):
-    a = random.randint(2, num)
+    a = random.randint(2, num - 1)
  
-    e =(num-1)/2
+    e = (num - 1) // 2
     t = 100
 
     while(t>0):
         result = FastExpo(a, e, num)
- 
+
         if((result % num)== 1 or (result % num)==(num - 1)):
             a = random.randint(2, num)
             t -= 1
@@ -25,7 +25,7 @@ def FastExpo(base, exp, mod):
             t = (t * base) % mod
  
         base = (base * base) % mod
-        exp = int(exp / 2)
+        exp = exp // 2
     return t % mod
 
 
@@ -48,6 +48,15 @@ def bits_to_bytes(bit_string):
     while byte_values[len(byte_values) - 1] == 0:
         byte_values = byte_values[0:len(byte_values) - 1]
     # print(type(byte_values[len(byte_values) - 1]))
+    return bytes(byte_values)
+
+def bits_to_bytes_nopad(bit_string):
+    if len(bit_string) % 8 != 0: 
+        padded_bit_string = bit_string + '0' * (8 - (len(bit_string) % 8))
+    else:
+        padded_bit_string = bit_string
+    chunks = [padded_bit_string[i:i+8] for i in range(0, len(padded_bit_string), 8)]
+    byte_values = [int(chunk, 2) for chunk in chunks]
     return bytes(byte_values)
 
 def Power(base, exp):

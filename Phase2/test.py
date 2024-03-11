@@ -1,4 +1,5 @@
 from math import pow
+from CryptoElgamal import *
 def test(a, p):
     s = set()
     for i in range(1, p):
@@ -35,7 +36,7 @@ def chekAlgo(b):
         print('')
     print('')
 
-
+p, s = ElgamalKeyGen(296255883173063500756876664533391692597)
 # print(FastExpo(705, 25, 761))
 # print(FastExpo(705, 46, 761))
 #test(718, 761)
