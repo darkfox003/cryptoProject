@@ -1,10 +1,12 @@
-import random
+import Crypto.Random.random as Cryprand
+import io
 from CryptoUtility import *
 from CryptoP1 import *
-from math import sqrt
+from PIL import Image
+from math import sqrt, ceil
 
 def GenGenerator(p):
-    rand = random.randint(2, p - 1)
+    rand = Cryprand.randint(2, p - 1)
     #rand = FastExpo(rand, 2, p)
     if IsPrime((p - 1) // 2):
         n = (p - 1) // 2
@@ -48,7 +50,7 @@ def GenPrimeFactor(p):
 
 def ElgamalKeyGen(p):
     g = GenGenerator(p)
-    u = random.randint(2, p - 1)
+    u = Cryprand.randint(2, p - 1)
     y = FastExpo(g, u, p)
     print("Public key (p, g, y) : (" + str(p) + ", " + str(g) + ", " + str(y) + ")")
     #print("Private key : " + str(u))
@@ -58,17 +60,12 @@ def ElgamalEncrypt(pk, txt):
     #res = StringToAscii(txt)
     cipher = []
     for ele in txt:
-        k =  random.randint(2, pk["p"] - 1)
+        k =  Cryprand.randint(2, pk["p"] - 1)
         while GCD(k, pk["p"] - 1) != 1:
-            k = random.randint(2, pk["p"] - 1)
+            k = Cryprand.randint(2, pk["p"] - 1)
         #print(k, end=' ')
         cipher.append(GenAB(pk, k, ele))
     return cipher
-
-def StringToAscii(txt):
-    res = [ord(ele) for ele in txt]
-    print(res)
-    return res
 
 def GenAB(pk, k, txt):
     a = FastExpo(pk["g"], k, pk["p"])
@@ -122,9 +119,6 @@ def outputCipher(cipher, p, file):
     res = bits_to_bytes(res)
     f.write(res)
     f.close()
-
-def outputImageCipher(cipher, p, file):
-    pass
 
 def inputCipher(file, p):
     f = open(file, "rb")
@@ -181,7 +175,7 @@ def writePrivateKey(sk):
     f.close()
 
 def main():
-    mode = int(input("Input Mode (1:KeyGen, 2:Encrypt, 3:Decrypt) : "))
+    mode = int(input("Input Mode (1:KeyGen, 2:Encrypt, 3:Decrypt, 4:AddPk) : "))
     if mode == 1:
         keyFile = input("What Key File : ")
         if keyFile == '':
@@ -201,10 +195,7 @@ def main():
         readF = readPlainText(file, pkWho["p"])
         cipher = ElgamalEncrypt(pkWho, readF)
         if output == '':
-            if lfile == 'jpg' or lfile == 'png':
-                outputCipher(cipher, pkWho["p"], "output."+lfile)
-            else:
-                outputCipher(cipher, pkWho["p"], "output."+lfile)
+            outputCipher(cipher, pkWho["p"], "output."+lfile)
         else:
             outputCipher(cipher, pkWho["p"], output)
     elif mode == 3:
@@ -214,6 +205,13 @@ def main():
         NewCipher = inputCipher(cipher, sk["p"])
         plainText = ElgamalDecrypt(sk, NewCipher)
         writePlainText(plainText, sk["p"], output)
+    elif mode == 4:
+        owner = input("Who is owner : ")
+        p = int(input("p : "))
+        g = int(input("g : "))
+        y = int(input("y : "))
+        pk = {"p": p, "g": g, "y": y}
+        writePublicKey(owner, pk)
     else:
         print("Mode error!!")
 

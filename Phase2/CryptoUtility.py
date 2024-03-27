@@ -1,7 +1,7 @@
-import random
+import Crypto.Random.random as Cryprand
 
 def IsPrime(num):
-    a = random.randint(2, num - 1)
+    a = Cryprand.randint(2, num - 1)
  
     e = (num - 1) // 2
     t = 100
@@ -10,7 +10,7 @@ def IsPrime(num):
         result = FastExpo(a, e, num)
 
         if((result % num)== 1 or (result % num)==(num - 1)):
-            a = random.randint(2, num)
+            a = Cryprand.randint(2, num)
             t -= 1
  
         else:
