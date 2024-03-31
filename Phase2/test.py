@@ -36,10 +36,35 @@ def chekAlgo(b):
         print('')
     print('')
 
+from PIL import Image
+
+def compare_images(image1_path, image2_path):
+    try:
+        # Open the images
+        with Image.open(image1_path) as img1, Image.open(image2_path) as img2:
+            # Convert images to bytes
+            img1_bytes = img1.tobytes()
+            img2_bytes = img2.tobytes()
+
+            # Compare byte by byte
+            if img1_bytes == img2_bytes:
+                print("Images are identical.")
+            else:
+                print("Images are different.")
+
+    except Exception as e:
+        print("An error occurred:", e)
+
+# Example usage
+image1_path = "download.jpg"
+image2_path = "res.jpg"
+compare_images(image1_path, image2_path)
+
+
 # p, s = ElgamalKeyGen(296255883173063500756876664533391692597)
 # print(FastExpo(705, 25, 761))
 # print(FastExpo(705, 46, 761))
 #test(718, 761)
 # chekAlgo(29)
-b = b'hello555'
-print(b.decode('utf-8'))
+# b = b'hello555'
+# print(b.decode('utf-8'))
