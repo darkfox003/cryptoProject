@@ -77,47 +77,6 @@ def ElgamalDecrypt(sk, cipher):
         res.append((FastExpo(ele["a"], exp, sk["p"]) * ele["b"]) % sk["p"])
     return res
 
-def readPlainText(filename, p):
-    blocksize = p.bit_length() - 1 
-    f = open(filename, "rb")
-    data = f.read()
-    f.close()
-    # print("Data : " + str(data))
-    data = bytes_to_bits_binary(data)
-    # print("DataB : " + str(data))
-    # print(bits_to_bytes(data))
-    block = []
-    for i in range(0, len(data) + 1, blocksize):
-        ele = data[i:i + blocksize]
-        if len(ele) != blocksize:
-            ele += '0' * (blocksize - len(ele))
-        block.append(int(ele, 2))
-    return block
-
-def writePlainText(output, p, file):
-    blocksize = p.bit_length() - 1
-    res = ''
-    for ele in output:
-        b = bin(ele)[2:].zfill(blocksize)
-        res += b
-    res = bits_to_bytes(res)
-    f = open(file, "wb")
-    f.write(res)
-    f.close()
-
-def outputCipher(cipher, p, file):
-    blocksize = p.bit_length()
-    f = open(file, "wb")
-    res = ''
-    for ele in cipher:
-        a = (bin(ele["a"])[2:]).zfill(blocksize)
-        b = (bin(ele["b"])[2:]).zfill(blocksize)
-        res += a
-        res += b
-    res = bits_to_bytes(res)
-    f.write(res)
-    f.close()
-
 def inputCipher(file, p):
     f = open(file, "rb")
     data = f.read()
@@ -134,8 +93,21 @@ def inputCipher(file, p):
             res.append(ele)
     return res
 
+def outputCipher(cipher, p, file):
+    blocksize = p.bit_length()
+    f = open(file, "wb")
+    res = ''
+    for ele in cipher:
+        a = (bin(ele["a"])[2:]).zfill(blocksize)
+        b = (bin(ele["b"])[2:]).zfill(blocksize)
+        res += a
+        res += b
+    res = bits_to_bytes(res)
+    f.write(res)
+    f.close()
+
 def readPublicKey():
-    f = open("./Phase2/pk.txt", "r")
+    f = open("./Phase3/pk.txt", "r")
     data = f.read()
     f.close()
     data = data.split('\n')
@@ -151,7 +123,7 @@ def readPublicKeyWho(who):
     return pkList[who]
 
 def readPrivateKey():
-    f = open("./Phase2/sk.txt", "r")
+    f = open("./Phase3/sk.txt", "r")
     data = f.read().split(' ')
     f.close()
     return {"u" : int(data[0]), "p" : int(data[1])}
@@ -162,56 +134,12 @@ def writePublicKey(owner, pk):
     out = ""
     for pk in pkList:
         out += pk + " " + str(pkList[pk]["p"]) + " " + str(pkList[pk]["g"]) + " " + str(pkList[pk]["y"]) + "\n"
-    f = open("./Phase2/pk.txt", "w")
+    f = open("./Phase3/pk.txt", "w")
     f.write(out)
     f.close()
 
 def writePrivateKey(sk):
     out = "" + str(sk["u"]) + " " + str(sk["p"])
-    f = open("./Phase2/sk.txt", "w")
+    f = open("./Phase3/sk.txt", "w")
     f.write(out)
     f.close()
-
-def main():
-    mode = int(input("Input Mode (1:KeyGen, 2:Encrypt, 3:Decrypt, 4:AddPk) : "))
-    if mode == 1:
-        keyFile = input("What Key File : ")
-        if keyFile == '':
-            p = GenPrime("./Phase2/inp.txt", 50)
-        else:
-            p = GenPrime(keyFile, 50)
-        pk, sk = ElgamalKeyGen(p)
-        writePublicKey("me", pk)
-        writePrivateKey(sk)
-    elif mode == 2:
-        file = input("What File : ")
-        who = input("Send to : ")
-        output = input("Output File : ")
-        lfile = file.split('.')
-        lfile = lfile[len(lfile) - 1]
-        pkWho = readPublicKeyWho(who)
-        readF = readPlainText(file, pkWho["p"])
-        cipher = ElgamalEncrypt(pkWho, readF)
-        if output == '':
-            outputCipher(cipher, pkWho["p"], "output."+lfile)
-        else:
-            outputCipher(cipher, pkWho["p"], output)
-    elif mode == 3:
-        cipher = input("Cipher File : ")
-        output = input("Output File : ")
-        sk = readPrivateKey()
-        NewCipher = inputCipher(cipher, sk["p"])
-        plainText = ElgamalDecrypt(sk, NewCipher)
-        writePlainText(plainText, sk["p"], output)
-    elif mode == 4:
-        owner = input("Who is owner : ")
-        p = int(input("p : "))
-        g = int(input("g : "))
-        y = int(input("y : "))
-        pk = {"p": p, "g": g, "y": y}
-        writePublicKey(owner, pk)
-    else:
-        print("Mode error!!")
-
-if __name__ == '__main__':
-    main()
