@@ -45,18 +45,10 @@ def bits_to_bytes(bit_string):
         padded_bit_string = bit_string
     chunks = [padded_bit_string[i:i+8] for i in range(0, len(padded_bit_string), 8)]
     byte_values = [int(chunk, 2) for chunk in chunks]
-    while byte_values[len(byte_values) - 1] == 0:
-        byte_values = byte_values[0:len(byte_values) - 1]
+    # while byte_values[len(byte_values) - 1] == 0:
+    #     print("delete")
+    #     byte_values = byte_values[0:len(byte_values) - 1]
     # print(type(byte_values[len(byte_values) - 1]))
-    return bytes(byte_values)
-
-def bits_to_bytes_nopad(bit_string):
-    if len(bit_string) % 8 != 0: 
-        padded_bit_string = bit_string + '0' * (8 - (len(bit_string) % 8))
-    else:
-        padded_bit_string = bit_string
-    chunks = [padded_bit_string[i:i+8] for i in range(0, len(padded_bit_string), 8)]
-    byte_values = [int(chunk, 2) for chunk in chunks]
     return bytes(byte_values)
 
 def Power(base, exp):
@@ -85,3 +77,10 @@ def FindInverse(A, M):
         b2 = (b2 + m0) % m0
 
     return b2 % m0
+
+def circular_right_shift(integer, n, bit_length):
+    # Ensure that n is within the range of bit_length
+    n %= bit_length
+    # Perform the circular right shift
+    shifted_integer = (integer >> n) | (integer << (bit_length - n)) & ((1 << bit_length) - 1)
+    return shifted_integer

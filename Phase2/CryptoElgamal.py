@@ -15,9 +15,7 @@ def GenGenerator(p):
     else:
         s = GenPrimeFactor(p - 1)
         while not CheckGenerator(rand, s, p):
-            #rand = random.randint(2, p - 1)
-            rand = (rand + 1) % p
-            print(rand)
+            rand = Cryprand.randint(2, p - 1)
             #rand = FastExpo(rand, 2, p)
         return rand
 

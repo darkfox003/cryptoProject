@@ -6,45 +6,11 @@ from math import sqrt
 def GenGenerator(p):
     rand = Cryprand.randint(2, p - 1)
     #rand = FastExpo(rand, 2, p)
-    if IsPrime((p - 1) // 2):
-        n = (p - 1) // 2
-        if FastExpo(rand, n, p) != 1:
-            return rand
-        else:
-            return -rand + p
-    else:
-        s = GenPrimeFactor(p - 1)
-        while not CheckGenerator(rand, s, p):
-            #rand = random.randint(2, p - 1)
-            rand = (rand + 1) % p
-            print(rand)
-            #rand = FastExpo(rand, 2, p)
+    n = (p - 1) // 2
+    if FastExpo(rand, n, p) != 1:
         return rand
-
-def CheckGenerator(g, s, p):
-    if GCD(g, p) != 1:
-        return False
-    for i in s:
-        if (FastExpo(g, (p - 1) // i, p) == 1):
-            return False
-    return True
-
-def GenPrimeFactor(p):
-    s = set()
-
-    while (p % 2 == 0):
-        s.add(2)
-        p //= 2
-    
-    for i in range(3, int(sqrt(p)), 2):
-        while (p % i == 0):
-            s.add(i)
-            p //= i
-
-    if (p > 2):
-        s.add(p)
-    
-    return s
+    else:
+        return -rand + p
 
 def ElgamalKeyGen(p):
     g = GenGenerator(p)
@@ -106,6 +72,47 @@ def outputCipher(cipher, p, file):
     f.write(res)
     f.close()
 
+def readPlainText(filename, p):
+    blocksize = p.bit_length() - 1 
+    f = open(filename, "rb")
+    data = f.read()
+    f.close()
+    # print("Data : " + str(data))
+    data = bytes_to_bits_binary(data)
+    # print("DataB : " + str(data))
+    # print(bits_to_bytes(data))
+    block = []
+    padlen = 0
+    for i in range(0, len(data) + 1, blocksize):
+        ele = data[i:i + blocksize]
+        if len(ele) != 0:
+            if len(ele) != blocksize:
+                padlen = blocksize - len(ele)
+                ele += '0' * padlen
+            block.append(int(ele, 2))
+        # if len(ele) != blocksize:
+        #     ele += '0' * (blocksize - len(ele))
+        # block.append(int(ele, 2))
+    block.append(padlen)
+    return block
+
+def writePlainText(output, p, file):
+    blocksize = p.bit_length() - 1
+    res = ''
+    padlen = output.pop()
+    for ele in output:
+        b = bin(ele)[2:].zfill(blocksize)
+        res += b
+    for i in range(padlen):
+        if res[-1] == '0':
+            res = res[:-1]
+        else:
+            break
+    res = bits_to_bytes(res)
+    f = open(file, "wb")
+    f.write(res)
+    f.close()
+
 def readPublicKey():
     f = open("./Phase3/pk.txt", "r")
     data = f.read()
@@ -137,6 +144,11 @@ def writePublicKey(owner, pk):
     f = open("./Phase3/pk.txt", "w")
     f.write(out)
     f.close()
+    if owner == 'me':
+        res = str(pkList[pk]["p"]) + " " + str(pkList[pk]["g"]) + " " + str(pkList[pk]["y"])
+        f = open("./Phase3/mypk.txt", "w")
+        f.write(res)
+        f.close()
 
 def writePrivateKey(sk):
     out = "" + str(sk["u"]) + " " + str(sk["p"])

@@ -3,41 +3,46 @@ from CryptoP1 import *
 from CryptoP2 import *
 import Crypto.Random.random as Cryprand
 
-def readPlainText(filename, p):
-    blocksize = p.bit_length() - 1 
+def readMessage(filename):
     f = open(filename, "rb")
     data = f.read()
     f.close()
-    # print("Data : " + str(data))
     data = bytes_to_bits_binary(data)
-    signature = sign(data)
-    # print("DataB : " + str(data))
-    # print(bits_to_bytes(data))
-    block = []
-    for i in range(0, len(data) + 1, blocksize):
-        ele = data[i:i + blocksize]
-        if len(ele) != blocksize:
-            ele += '0' * (blocksize - len(ele))
-        block.append(int(ele, 2))
-    block.append(signature['r'])
-    block.append(signature['s'])
-    return block
+    return data
 
-def writePlainText(output, p, file, pkSender):
-    blocksize = p.bit_length() - 1
-    res = ''
-    signature = {'r' : output[-2], 's' : output[-1]}
-    output = output[:-2]
-    for ele in output:
-        b = bin(ele)[2:].zfill(blocksize)
-        res += b
-    res = res + '0' * (8 - (len(res) % 8))
-    while res[-8:] == '0' * 8:
-        res = res[:-8]
-    verify(res, signature, pkSender)
-    res = bits_to_bytes(res)
-    f = open(file, "wb")
-    f.write(res)
+def writeMessage(filename, msg):
+    data = bits_to_bytes(msg)
+    f = open(filename, "wb")
+    f.write(data)
+    f.close()
+
+def readSignature(filename, pkSender):
+    f = open(filename, "rb")
+    data = f.read()
+    f.close()
+    data = bytes_to_bits_binary(data)
+    padlen = int(data[-8:], 2)
+    data = data[:-8]
+    for i in range(padlen):
+        if data[-1] == '0':
+            data = data[:-1]
+    block = pkSender['p'].bit_length()
+    s = data[-block:]
+    data = data[:-block]
+    r = data[-block:]
+    data = data[:-block]
+    return data, {'r' : int(r, 2), 's' : int(s, 2)}
+
+def writeSignature(filename, msg, signature):
+    allsig = signature["r"] + signature["s"]
+    padlen = (8 - (len(allsig) % 8)) % 8
+    if padlen != 0:
+        allsig += '0' * padlen
+    allsig += bin(padlen)[2:].zfill(8)
+    msg_sig = msg + allsig
+    msg_sig = bits_to_bytes(msg_sig)
+    f = open(filename, "wb")
+    f.write(msg_sig)
     f.close()
 
 def sign(msg):
@@ -49,7 +54,7 @@ def sign(msg):
     r = FastExpo(pk['g'], k, pk['p'])
     ik = FindInverse(k, pk['p'] - 1)
     s = (ik * ((RWHash(msg, pk['p']) - ((sk['u'] * r) % (pk['p'] - 1))) % (pk['p'] - 1))) % (pk['p'] - 1) 
-    return {'r' : r, 's' : s}
+    return {'r' : bin(r)[2:].zfill(pk['p'].bit_length()), 's' : bin(s)[2:].zfill(pk['p'].bit_length())}
 
 def verify(msg, signature, pk):
     test1 = FastExpo(pk['g'], RWHash(msg, pk['p']), pk['p'])
@@ -59,7 +64,9 @@ def verify(msg, signature, pk):
     if test1 != test2:
         sel = input('This message has change, Do you want to continue read? (yes / no): ')
         if sel == 'no':
-            exit(0)    
+            exit(0)
+    else :
+        print("This message has not change")    
 
 def RWHash(msg, p):
     outputSize = p.bit_length() - 1
@@ -75,16 +82,17 @@ def RWHash(msg, p):
         for i in range(0, len(chunk), outputSize):
             sub = int(chunk[i:i+outputSize], 2)
             res = (res + (FastExpo(sub, (i + 1), p))) % p
+        res = circular_right_shift(res, 16, outputSize)
     return res
 
 def main():
-    mode = int(input("Input Mode (1:KeyGen, 2:Encrypt, 3:Decrypt, 4:AddPk) : "))
+    mode = int(input("Input Mode (1:KeyGen, 2:Encrypt, 3:Decrypt, 4:AddPk, 5:sign, 6:verify) : "))
     if mode == 1:
         keyFile = input("What Key File : ")
         if keyFile == '':
-            p = GenPrime("./Phase2/inp.txt", 50)
+            p = GenPrime("./Phase2/inp.txt", 400)
         else:
-            p = GenPrime(keyFile, 50)
+            p = GenPrime(keyFile, 400)
         pk, sk = ElgamalKeyGen(p)
         writePublicKey("me", pk)
         writePrivateKey(sk)
@@ -103,20 +111,34 @@ def main():
             outputCipher(cipher, pkWho["p"], output)
     elif mode == 3:
         cipher = input("Cipher File : ")
-        sender = input("Who sent : ")
         output = input("Output File : ")
         sk = readPrivateKey()
-        pkSender = readPublicKeyWho(sender)
         NewCipher = inputCipher(cipher, sk["p"])
         plainText = ElgamalDecrypt(sk, NewCipher)
-        writePlainText(plainText, sk["p"], output, pkSender)
+        writePlainText(plainText, sk["p"], output)
     elif mode == 4:
         owner = input("Who is owner : ")
-        p = int(input("p : "))
-        g = int(input("g : "))
-        y = int(input("y : "))
-        pk = {"p": p, "g": g, "y": y}
+        pkfile = input("What File : ")
+        f = open(pkfile, "r")
+        data = f.read()
+        f.close()
+        data = data.split(' ')
+        pk = {"p": data[0], "g": data[1], "y": data[2]}
         writePublicKey(owner, pk)
+    elif mode == 5:
+        msgFile = input("Message File : ")
+        output = input("Output File : ")
+        msg = readMessage(msgFile)
+        signature = sign(msg)
+        writeSignature(output, msg, signature)
+    elif mode == 6:
+        filename = input("Input File : ")
+        sender = input("Who sent : ")
+        output = input("Output File : ")
+        pkSender = readPublicKeyWho(sender)
+        msg, signature = readSignature(filename, pkSender)
+        verify(msg, signature, pkSender)
+        writeMessage(output, msg)
     else:
         print("Mode error!!")
 
