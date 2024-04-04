@@ -90,7 +90,7 @@ def main():
     if mode == 1:
         keyFile = input("What Key File : ")
         if keyFile == '':
-            p = GenPrime("./Phase2/inp.txt", 400)
+            p = GenPrime("./Phase2/inp.txt", 100)
         else:
             p = GenPrime(keyFile, 400)
         pk, sk = ElgamalKeyGen(p)

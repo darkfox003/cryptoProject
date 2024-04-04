@@ -139,16 +139,16 @@ def writePublicKey(owner, pk):
     pkList = readPublicKey()
     pkList[owner] = pk
     out = ""
+    if owner == "me":
+        res = str(pk["p"]) + " " + str(pk["g"]) + " " + str(pk["y"])
+        f = open("./Phase3/mypk.txt", "w")
+        f.write(res)
+        f.close()
     for pk in pkList:
         out += pk + " " + str(pkList[pk]["p"]) + " " + str(pkList[pk]["g"]) + " " + str(pkList[pk]["y"]) + "\n"
     f = open("./Phase3/pk.txt", "w")
     f.write(out)
     f.close()
-    if owner == 'me':
-        res = str(pkList[pk]["p"]) + " " + str(pkList[pk]["g"]) + " " + str(pkList[pk]["y"])
-        f = open("./Phase3/mypk.txt", "w")
-        f.write(res)
-        f.close()
 
 def writePrivateKey(sk):
     out = "" + str(sk["u"]) + " " + str(sk["p"])
